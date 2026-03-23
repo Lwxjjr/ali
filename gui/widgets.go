@@ -52,7 +52,7 @@ type widgets struct {
 	navi          Text
 }
 
-// Thg given params is used for displayed text.
+// 给定的参数用于显示文本
 func newWidgets(targetURL string, rate int, duration time.Duration, method string) (*widgets, error) {
 	latencyChart, err := newLineChart()
 	if err != nil {

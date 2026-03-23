@@ -32,7 +32,7 @@ const (
 
 var DefaultLocalAddr = net.IPAddr{IP: net.IPv4zero}
 
-// Options provides optional settings to attack.
+// Options 提供攻击的可选设置
 type Options struct {
 	Rate        int
 	Duration    time.Duration
@@ -61,17 +61,17 @@ type Options struct {
 }
 
 type Attacker interface {
-	// Attack keeps the request running for the specified period of time.
-	// Results are sent to the given channel as soon as they arrive.
-	// When the attack is over, it gives back final statistics.
-	// TODO: Use storage instead of metricsCh
+	// Attack 在指定的时间段内持续发送请求
+	// 结果一到达就发送到给定的通道
+	// 攻击结束后，返回最终统计数据
+	// TODO: 使用 storage 替代 metricsCh
 	Attack(ctx context.Context, metricsCh chan *Metrics) error
 
-	// Rate gives back the rate set to itself.
+	// Rate 返回设置的速率
 	Rate() int
-	// Rate gives back the duration set to itself.
+	// Duration 返回设置的持续时间
 	Duration() time.Duration
-	// Rate gives back the method set to itself.
+	// Method 返回设置的HTTP方法
 	Method() string
 }
 

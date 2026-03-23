@@ -31,7 +31,7 @@ import (
 var (
 	flagSet = flag.NewFlagSet("ali", flag.ContinueOnError)
 
-	// Automatically populated by goreleaser during build
+	// 由 goreleaser 在构建期间自动填充
 	version = "unversioned"
 	commit  = "?"
 	date    = "?"
@@ -41,7 +41,7 @@ var (
 )
 
 type cli struct {
-	// options for attacker
+	// 攻击器的选项
 	rate               int
 	duration           time.Duration
 	timeout            time.Duration
@@ -63,11 +63,11 @@ type cli struct {
 	tlsKeyFile         string
 	caCert             string
 
-	//options for gui
+	// GUI 的选项
 	queryRange     time.Duration
 	redrawInterval time.Duration
 
-	// options for export
+	// 导出的选项
 	exportTo string
 
 	debug   bool
@@ -109,7 +109,7 @@ func parseFlags(stdout, stderr io.Writer) (*cli, error) {
 	flagSet.StringVar(&c.caCert, "cacert", "", "PEM ca certificate file")
 	flagSet.StringVar(&c.tlsCertFile, "cert", "", "PEM encoded tls certificate file to use")
 	flagSet.StringVar(&c.tlsKeyFile, "key", "", "PEM encoded tls private key file to use")
-	// TODO: Re-enable when making it capable of drawing histogram bar chart.
+	// TODO: 当能够绘制直方图柱状图时重新启用
 	//flagSet.StringVar(&c.buckets, "buckets", "", "Histogram buckets; comma-separated list.")
 	flagSet.StringVar(&c.resolvers, "resolvers", "", "Custom DNS resolver addresses; comma-separated list.")
 	flagSet.DurationVar(&c.queryRange, "query-range", gui.DefaultQueryRange, "The results within the given time range will be drawn on the charts")
@@ -169,7 +169,7 @@ func (c *cli) run(args []string) int {
 	}
 	opts.Exporter = exporter
 
-	// Data points out of query range get flushed to prevent using heap more than need.
+	// 超出查询范围的数据点会被清除，以防止过度使用堆内存
 	s, err := storage.NewStorage(c.queryRange * 2)
 	if err != nil {
 		fmt.Fprintf(c.stderr, "failed to initialize time-series storage: %v\n", err)
@@ -212,7 +212,7 @@ Author:
 	fmt.Fprintf(c.stderr, format, flagSet.FlagUsages())
 }
 
-// makeAttackerOptions gives back an options for attacker, with the CLI input.
+// makeAttackerOptions 根据 CLI 输入返回攻击器的选项
 func (c *cli) makeAttackerOptions() (*attacker.Options, error) {
 	if !validateMethod(c.method) {
 		return nil, fmt.Errorf("given method %q isn't an HTTP request method", c.method)
@@ -231,8 +231,8 @@ func (c *cli) makeAttackerOptions() (*attacker.Options, error) {
 		if key == "" || val == "" {
 			return nil, fmt.Errorf("given header %q has a wrong format", hdr)
 		}
-		// NOTE: Add key/value directly to the http.Header (map[string][]string).
-		// http.Header.Add() canonicalizes keys but the vegeta API is used to test systems that require case-sensitive headers.
+		// 注意：直接将键/值添加到 http.Header（map[string][]string）。
+		// http.Header.Add() 会规范化键，但 vegeta API 用于测试需要区分大小写头的系统
 		header[key] = append(header[key], val)
 	}
 

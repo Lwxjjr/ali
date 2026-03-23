@@ -6,65 +6,65 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
-// Metrics wraps "vegeta.Metrics" to avoid dependency on it.
+// Metrics 包装 "vegeta.Metrics" 以避免对它的依赖
 type Metrics struct {
-	// Latencies holds computed request latency metrics.
+	// Latencies 保存计算出的请求延迟指标
 	Latencies LatencyMetrics `json:"latencies"`
-	// Histogram, only if requested
+	// Histogram，仅在请求时提供
 	// Histogram *vegeta.Histogram `json:"buckets,omitempty"`
-	// BytesIn holds computed incoming byte metrics.
+	// BytesIn 保存计算出的输入字节指标
 	BytesIn ByteMetrics `json:"bytes_in"`
-	// BytesOut holds computed outgoing byte metrics.
+	// BytesOut 保存计算出的输出字节指标
 	BytesOut ByteMetrics `json:"bytes_out"`
-	// Earliest is the earliest timestamp in a Result set.
+	// Earliest 是结果集中的最早时间戳
 	Earliest time.Time `json:"earliest"`
-	// Latest is the latest timestamp in a Result set.
+	// Latest 是结果集中的最晚时间戳
 	Latest time.Time `json:"latest"`
-	// End is the latest timestamp in a Result set plus its latency.
+	// End 是结果集中的最晚时间戳加上其延迟
 	End time.Time `json:"end"`
-	// Duration is the duration of the attack.
+	// Duration 是攻击的持续时间
 	Duration time.Duration `json:"duration"`
-	// Wait is the extra time waiting for responses from targets.
+	// Wait 是等待目标响应的额外时间
 	Wait time.Duration `json:"wait"`
-	// Requests is the total number of requests executed.
+	// Requests 是执行请求的总数
 	Requests uint64 `json:"requests"`
-	// Rate is the rate of sent requests per second.
+	// Rate 是每秒发送请求的速率
 	Rate float64 `json:"rate"`
-	// Throughput is the rate of successful requests per second.
+	// Throughput 是每秒成功请求的速率
 	Throughput float64 `json:"throughput"`
-	// Success is the percentage of non-error responses.
+	// Success 是非错误响应的百分比
 	Success float64 `json:"success"`
-	// StatusCodes is a histogram of the responses' status codes.
+	// StatusCodes 是响应状态码的直方图
 	StatusCodes map[string]int `json:"status_codes"`
-	// Errors is a set of unique errors returned by the targets during the attack.
+	// Errors 是攻击期间目标返回的唯一错误集合
 	Errors []string `json:"errors"`
 }
 
-// LatencyMetrics holds computed request latency metrics.
+// LatencyMetrics 保存计算出的请求延迟指标
 type LatencyMetrics struct {
-	// Total is the total latency sum of all requests in an attack.
+	// Total 是攻击中所有请求的延迟总和
 	Total time.Duration `json:"total"`
-	// Mean is the mean request latency.
+	// Mean 是平均请求延迟
 	Mean time.Duration `json:"mean"`
-	// P50 is the 50th percentile request latency.
+	// P50 是第50百分位请求延迟
 	P50 time.Duration `json:"50th"`
-	// P90 is the 90th percentile request latency.
+	// P90 是第90百分位请求延迟
 	P90 time.Duration `json:"90th"`
-	// P95 is the 95th percentile request latency.
+	// P95 是第95百分位请求延迟
 	P95 time.Duration `json:"95th"`
-	// P99 is the 99th percentile request latency.
+	// P99 是第99百分位请求延迟
 	P99 time.Duration `json:"99th"`
-	// Max is the maximum observed request latency.
+	// Max 是观察到的最大请求延迟
 	Max time.Duration `json:"max"`
-	// Min is the minimum observed request latency.
+	// Min 是观察到的最小请求延迟
 	Min time.Duration `json:"min"`
 }
 
-// ByteMetrics holds computed byte flow metrics.
+// ByteMetrics 保存计算出的字节流量指标
 type ByteMetrics struct {
-	// Total is the total number of flowing bytes in an attack.
+	// Total 是攻击中流过的字节总数
 	Total uint64 `json:"total"`
-	// Mean is the mean number of flowing bytes per hit.
+	// Mean 是每次命中流过的平均字节数
 	Mean float64 `json:"mean"`
 }
 

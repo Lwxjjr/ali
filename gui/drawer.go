@@ -17,9 +17,9 @@ import (
 	"github.com/nakabonne/ali/storage"
 )
 
-// drawer periodically queries data points from the storage and passes them to the termdash API.
+// drawer 定期从存储中查询数据点，并将它们传递给 termdash API
 type drawer struct {
-	// specify the data points range to show on the UI
+	// 指定在 UI 上显示的数据点范围
 	queryRange     time.Duration
 	redrawInterval time.Duration
 	widgets        *widgets
@@ -27,7 +27,7 @@ type drawer struct {
 
 	metricsCh chan *attacker.Metrics
 
-	// aims to avoid to perform multiple `appendChartValues`.
+	// 旨在避免执行多次 `appendChartValues`
 	chartDrawing *atomic.Bool
 
 	mu      sync.RWMutex
@@ -38,7 +38,7 @@ type drawer struct {
 	exportErr error
 }
 
-// redrawCharts sets the values held by itself as chart values, at the specified interval as redrawInterval.
+// redrawCharts 以 redrawInterval 指定的间隔，将自身保存的值设置为图表值
 func (d *drawer) redrawCharts(ctx context.Context) {
 	ticker := time.NewTicker(d.redrawInterval)
 	defer ticker.Stop()
@@ -152,7 +152,7 @@ Latest: %v
 End: %v`
 )
 
-// redrawMetrics writes the metrics held by itself into the widgets, at the specified interval as redrawInterval.
+// redrawMetrics 以 redrawInterval 指定的间隔，将自身保存的指标写入组件
 func (d *drawer) redrawMetrics(ctx context.Context) {
 	ticker := time.NewTicker(d.redrawInterval)
 	defer ticker.Stop()

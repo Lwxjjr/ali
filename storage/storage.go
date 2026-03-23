@@ -16,8 +16,8 @@ const (
 	P99MetricName     = "p99"
 )
 
-// Storage provides goroutine safe capabilities of insertion into and retrieval from the time-series storage.
-// Backed by "nakabonne/tstorage"
+// Storage 提供对时间序列存储的插入和检索的 goroutine 安全功能
+// 由 "nakabonne/tstorage" 支持
 type Storage interface {
 	Writer
 	Reader
@@ -31,7 +31,7 @@ type Reader interface {
 	Select(metric string, start, end time.Time) ([]float64, error)
 }
 
-// Result contains the results of a single HTTP request.
+// Result 包含单个 HTTP 请求的结果
 type Result struct {
 	Code      uint16
 	Timestamp time.Time
@@ -57,8 +57,8 @@ type storage struct {
 	backend tstorage.Storage
 }
 
-// Insert writes the given result to the backend storage.
-// The unit of value will be converted in milliseconds.
+// Insert 将给定的结果写入后端存储
+// 值的单位将转换为毫秒
 func (s *storage) Insert(result *Result) error {
 	// Convert timestamp into unix time in nanoseconds.
 	timestamp := result.Timestamp.UnixNano()

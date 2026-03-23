@@ -129,8 +129,8 @@ func newChartWithLegends(lineChart LineChart, opts []container.Option, texts ...
 	return g.Build()
 }
 
-// gridOpts holds all options in our grid.
-// It basically holds the container options (column, width, padding, etc) of our widgets.
+// gridOpts 保存我们网格中的所有选项
+// 它基本上保存了我们组件的容器选项（列、宽度、边距等）
 type gridOpts struct {
 	// base options
 	base []container.Option
