@@ -30,7 +30,7 @@ func TestExportCLI_NoExportTo_NoFilesCreated(t *testing.T) {
 	}
 	var gotExporter *export.FileExporter
 	newAttacker = func(_ storage.Writer, _ string, opts *attacker.Options) (attacker.Attacker, error) {
-		gotExporter = opts.Exporter
+		gotExporter = opts.Output.Exporter
 		if gotExporter != nil {
 			return nil, fmt.Errorf("unexpected exporter %v", gotExporter)
 		}
@@ -60,15 +60,15 @@ func TestExportCLI_CreateDirAndFiles(t *testing.T) {
 		return a.Attack(ctx, metricsCh)
 	}
 	newAttacker = func(_ storage.Writer, target string, opts *attacker.Options) (attacker.Attacker, error) {
-		if opts.Exporter == nil {
+		if opts.Output.Exporter == nil {
 			return nil, fmt.Errorf("exporter is required for this test")
 		}
 		meta := export.Meta{
 			ID:        "00000000-0000-0000-0000-000000000000",
 			TargetURL: target,
-			Method:    opts.Method,
-			Rate:      opts.Rate,
-			Duration:  opts.Duration,
+			Method:    opts.HTTP.Method,
+			Rate:      opts.Performance.Rate,
+			Duration:  opts.Performance.Duration,
 		}
 		results := []export.Result{
 			{
@@ -78,7 +78,7 @@ func TestExportCLI_CreateDirAndFiles(t *testing.T) {
 			},
 		}
 		return &exportingAttacker{
-			exporter: opts.Exporter,
+			exporter: opts.Output.Exporter,
 			meta:     meta,
 			results:  results,
 			summary:  export.Summary{},

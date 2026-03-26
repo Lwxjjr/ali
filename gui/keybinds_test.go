@@ -399,11 +399,14 @@ func TestAttack(t *testing.T) {
 				}(),
 			},
 			want: attacker.Options{
-				Rate:     50,
-				Duration: 10 * time.Second,
-				Timeout:  30 * time.Second,
-				Method:   "",
-				Header:   http.Header{},
+				Performance: attacker.PerformanceOptions{
+					Rate:     50,
+					Duration: 10 * time.Second,
+					Timeout:  30 * time.Second,
+				},
+				HTTP: attacker.HTTPConfig{
+					Header: http.Header{},
+				},
 			},
 			wantErr: false,
 		},
@@ -442,16 +445,20 @@ func TestAttack(t *testing.T) {
 				}(),
 			},
 			want: attacker.Options{
-				Rate:     1,
-				Duration: time.Second,
-				Timeout:  time.Second,
-				Method:   "POST",
-				Header: http.Header{
-					"Foo": []string{
-						"Bar",
-					},
+				Performance: attacker.PerformanceOptions{
+					Rate:     1,
+					Duration: time.Second,
+					Timeout:  time.Second,
 				},
-				Body: []byte(`{"foo": 1}`),
+				HTTP: attacker.HTTPConfig{
+					Method: "POST",
+					Header: http.Header{
+						"Foo": []string{
+							"Bar",
+						},
+					},
+					Body: []byte(`{"foo": 1}`),
+				},
 			},
 			wantErr: false,
 		},

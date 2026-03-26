@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -167,7 +166,7 @@ func (c *cli) run(args []string) int {
 		}
 		exporter = export.NewFileExporter(c.exportTo)
 	}
-	opts.Exporter = exporter
+	opts.Output.Exporter = exporter
 
 	// 超出查询范围的数据点会被清除，以防止过度使用堆内存
 	s, err := storage.NewStorage(c.queryRange * 2)
@@ -242,7 +241,7 @@ func (c *cli) makeAttackerOptions() (*attacker.Options, error) {
 
 	body := []byte(c.body)
 	if c.bodyFile != "" {
-		b, err := ioutil.ReadFile(c.bodyFile)
+		b, err := os.ReadFile(c.bodyFile)
 		if err != nil {
 			return nil, fmt.Errorf("unable to open %q: %w", c.bodyFile, err)
 		}
@@ -275,7 +274,7 @@ func (c *cli) makeAttackerOptions() (*attacker.Options, error) {
 	var caCertPool *x509.CertPool
 	if c.caCert != "" {
 		caCertPool = x509.NewCertPool()
-		caCert, err := ioutil.ReadFile(c.caCert)
+		caCert, err := os.ReadFile(c.caCert)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -283,24 +282,32 @@ func (c *cli) makeAttackerOptions() (*attacker.Options, error) {
 	}
 
 	return &attacker.Options{
-		Rate:               c.rate,
-		Duration:           c.duration,
-		Timeout:            c.timeout,
-		Method:             c.method,
-		Body:               body,
-		MaxBody:            c.maxBody,
-		Header:             header,
-		KeepAlive:          !c.noKeepAlive,
-		Workers:            c.workers,
-		MaxWorkers:         c.maxWorkers,
-		Connections:        c.connections,
-		HTTP2:              !c.noHTTP2,
-		LocalAddr:          localAddr,
-		Buckets:            parsedBuckets,
-		Resolvers:          parsedResolvers,
-		InsecureSkipVerify: c.insecureSkipVerify,
-		TLSCertificates:    certs,
-		CACertificatePool:  caCertPool,
+		Performance: attacker.PerformanceOptions{
+			Rate:       c.rate,
+			Duration:   c.duration,
+			Timeout:    c.timeout,
+			Workers:    c.workers,
+			MaxWorkers: c.maxWorkers,
+		},
+		HTTP: attacker.HTTPConfig{
+			Method:      c.method,
+			Body:        body,
+			MaxBody:     c.maxBody,
+			Header:      header,
+			KeepAlive:   !c.noKeepAlive,
+			Connections: c.connections,
+			HTTP2:       !c.noHTTP2,
+		},
+		Network: attacker.NetworkConfig{
+			LocalAddr:          localAddr,
+			Resolvers:          parsedResolvers,
+			InsecureSkipVerify: c.insecureSkipVerify,
+			TLSCertificates:    certs,
+			CACertificatePool:  caCertPool,
+		},
+		Output: attacker.OutputConfig{
+			Buckets: parsedBuckets,
+		},
 	}, nil
 }
 
