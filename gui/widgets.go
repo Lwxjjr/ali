@@ -12,47 +12,58 @@ import (
 	"github.com/mum4k/termdash/widgets/text"
 )
 
+// LineChart 定义了折线图组件的行为接口，方便进行 mock 测试。
 type LineChart interface {
 	widgetapi.Widget
 	Series(label string, values []float64, opts ...linechart.SeriesOption) error
 }
 
+// Text 定义了文本组件的行为接口。
 type Text interface {
 	widgetapi.Widget
 	Write(text string, wOpts ...text.WriteOption) error
 }
 
+// Gauge 定义了仪表盘（进度条）组件的行为接口。
 type Gauge interface {
 	widgetapi.Widget
 	Percent(p int, opts ...gauge.Option) error
 }
 
+// chartLegend 将文本组件和单元格样式组合，用于图表图例展示。
 type chartLegend struct {
 	text     Text
 	cellOpts []cell.Option
 }
 
+// widgets 包含了 UI 界面中用到的所有组件实例。
 type widgets struct {
+	// latencyChart 展示实时延迟的折线图
 	latencyChart LineChart
 
-	paramsText      Text
-	latenciesText   Text
-	bytesText       Text
-	statusCodesText Text
-	errorsText      Text
-	othersText      Text
+	// 各种信息展示文本块
+	paramsText      Text // 攻击参数（目标、速率等）
+	latenciesText   Text // 详细延迟统计（Mean, P50, P90...）
+	bytesText       Text // 流量统计
+	statusCodesText Text // HTTP 状态码分布
+	errorsText      Text // 错误信息列表
+	othersText      Text // 其他指标（吞吐量、成功率等）
 
+	// percentilesChart 展示百分位数分布的折线图
 	percentilesChart LineChart
 	p99Legend        chartLegend
 	p95Legend        chartLegend
 	p90Legend        chartLegend
 	p50Legend        chartLegend
 
+	// progressGauge 显示攻击进度的进度条
 	progressGauge Gauge
+	// navi 显示操作快捷键提示
 	navi          Text
 }
 
-// 给定的参数用于显示文本
+// newWidgets 构造并初始化所有 UI 组件。
+// targetURL, rate, duration, method 用于填充初始的参数展示区。
 func newWidgets(targetURL string, rate int, duration time.Duration, method string) (*widgets, error) {
 	latencyChart, err := newLineChart()
 	if err != nil {
@@ -80,6 +91,7 @@ func newWidgets(targetURL string, rate int, duration time.Duration, method strin
 		return nil, err
 	}
 
+	// 初始化图例及其颜色
 	p99Color := cell.FgColor(cell.ColorNumber(87))
 	p99Text, err := newText("p99", text.WriteCellOpts(p99Color))
 	if err != nil {
@@ -136,6 +148,7 @@ func newWidgets(targetURL string, rate int, duration time.Duration, method strin
 	}, nil
 }
 
+// newLineChart 创建并配置折线图的轴颜色等基本样式。
 func newLineChart() (LineChart, error) {
 	return linechart.New(
 		linechart.AxesCellOpts(cell.FgColor(cell.ColorRed)),
@@ -144,6 +157,7 @@ func newLineChart() (LineChart, error) {
 	)
 }
 
+// newText 创建并配置文本组件，支持自动换行和滚动。
 func newText(s string, opts ...text.WriteOption) (Text, error) {
 	t, err := text.New(text.RollContent(), text.WrapAtWords())
 	if err != nil {
@@ -157,12 +171,14 @@ func newText(s string, opts ...text.WriteOption) (Text, error) {
 	return t, nil
 }
 
+// newGauge 创建并配置进度条组件。
 func newGauge() (Gauge, error) {
 	return gauge.New(
 		gauge.Border(linestyle.None),
 	)
 }
 
+// makeParamsText 格式化攻击参数文本。
 func makeParamsText(targetURL string, rate int, duration time.Duration, method string) string {
 	return fmt.Sprintf(`Target: %s
 Rate: %d

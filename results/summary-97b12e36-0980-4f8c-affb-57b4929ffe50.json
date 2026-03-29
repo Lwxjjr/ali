@@ -1,0 +1,42 @@
+{
+  "target": {
+    "url": "http://127.0.0.1:8081/bytes/:5",
+    "method": "GET"
+  },
+  "parameters": {
+    "rate": 200,
+    "duration_seconds": 30
+  },
+  "timing": {
+    "earliest": "2026-03-29T21:01:57.696535502+08:00",
+    "latest": "2026-03-29T21:02:27.692087948+08:00"
+  },
+  "requests": {
+    "count": 6000,
+    "success_ratio": 0
+  },
+  "throughput": 0,
+  "latency_ms": {
+    "total": 3919.870783,
+    "mean": 0.653311,
+    "p50": 0.568609,
+    "p90": 1.026064,
+    "p95": 1.206181,
+    "p99": 1.783768,
+    "max": 3.734816,
+    "min": 0.207272
+  },
+  "bytes": {
+    "in": {
+      "total": 786000,
+      "mean": 131
+    },
+    "out": {
+      "total": 0,
+      "mean": 0
+    }
+  },
+  "status_codes": {
+    "400": 6000
+  }
+}

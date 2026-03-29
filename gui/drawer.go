@@ -17,28 +17,34 @@ import (
 	"github.com/nakabonne/ali/storage"
 )
 
-// drawer 定期从存储中查询数据点，并将它们传递给 termdash API
+// drawer 负责定期从存储中查询数据点，并将它们同步到 termdash 组件中。
 type drawer struct {
-	// 指定在 UI 上显示的数据点范围
+	// queryRange 指定在 UI 图表上显示的历史数据时间范围
 	queryRange     time.Duration
+	// redrawInterval 指定屏幕重绘的时间间隔
 	redrawInterval time.Duration
+	// widgets 持有所有的 UI 组件实例
 	widgets        *widgets
+	// gridOpts 保存网格布局的配置
 	gridOpts       *gridOpts
 
+	// metricsCh 用于接收从攻击器传来的实时指标数据
 	metricsCh chan *attacker.Metrics
 
-	// 旨在避免执行多次 `appendChartValues`
+	// chartDrawing 使用原子布尔值防止在单次攻击中重复启动绘制协程
 	chartDrawing *atomic.Bool
 
 	mu      sync.RWMutex
+	// metrics 缓存当前的最新指标，用于文本展示
 	metrics *attacker.Metrics
+	// storage 提供对时间序列数据的读取能力
 	storage storage.Reader
 
 	errMu     sync.Mutex
 	exportErr error
 }
 
-// redrawCharts 以 redrawInterval 指定的间隔，将自身保存的值设置为图表值
+// redrawCharts 以 redrawInterval 为间隔，从存储中拉取数据并更新折线图（延迟图和百分位数图）。
 func (d *drawer) redrawCharts(ctx context.Context) {
 	ticker := time.NewTicker(d.redrawInterval)
 	defer ticker.Stop()
@@ -53,6 +59,7 @@ L:
 			end := time.Now()
 			start := end.Add(-d.queryRange)
 
+			// 更新实时延迟图表
 			latencies, err := d.storage.Select(storage.LatencyMetricName, start, end)
 			if err != nil {
 				log.Printf("failed to select latency data points: %v\n", err)
@@ -64,6 +71,7 @@ L:
 				}),
 			)
 
+			// 更新百分位数图表（P50, P90, P95, P99）
 			p50, err := d.storage.Select(storage.P50MetricName, start, end)
 			if err != nil {
 				log.Printf("failed to select p50 data points: %v\n", err)
@@ -100,6 +108,7 @@ L:
 	d.chartDrawing.Store(false)
 }
 
+// redrawGauge 负责更新攻击进度的仪表盘。
 func (d *drawer) redrawGauge(ctx context.Context, duration time.Duration) {
 	ticker := time.NewTicker(d.redrawInterval)
 	defer ticker.Stop()
@@ -114,8 +123,7 @@ func (d *drawer) redrawGauge(ctx context.Context, duration time.Duration) {
 		case <-ticker.C:
 			passed := float64(time.Since(start))
 			percent := int(passed / totalTime * 100)
-			// as time.Duration is the unit of nanoseconds
-			// small duration can exceed 100 on slow machines
+			// 由于 time.Duration 单位是纳秒，在慢速机器上微小的时间差可能导致百分比超过 100
 			if percent > 100 {
 				continue
 			}

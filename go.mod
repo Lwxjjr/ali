@@ -1,8 +1,6 @@
 module github.com/nakabonne/ali
 
-go 1.24.0
-
-toolchain go1.24.5
+go 1.25.0
 
 require (
 	github.com/golang/mock v1.6.0
@@ -24,6 +22,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mattn/go-runewidth v0.0.12 // indirect
+	github.com/mccutchen/go-httpbin/v2 v2.21.0 // indirect
 	github.com/nsf/termbox-go v0.0.0-20201107200903-9b52a5faed9e // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.1.0 // indirect
